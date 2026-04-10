@@ -1,0 +1,427 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{padding:16px;font-family:var(--font-sans)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px 16px;margin-bottom:12px}
+.sec-title{font-size:11px;font-weight:500;color:var(--color-text-secondary);letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.label{font-size:12px;color:var(--color-text-secondary);min-width:72px}
+input[type=text],input[type=number],select,textarea{font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:6px 10px;width:100%}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;text-align:center}
+.stat-lbl{font-size:10px;color:var(--color-text-secondary)}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary);line-height:1.2}
+.stat-unit{font-size:11px;color:var(--color-text-secondary)}
+.btn{padding:8px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:transparent;color:var(--color-text-primary);font-size:12px;font-family:var(--font-sans);cursor:pointer;transition:background .12s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-start{background:#2C2C2A;color:#F1EFE8;border-color:#2C2C2A;font-weight:500}
+.btn-start:hover{background:#444441}
+.btn-stop{background:#A32D2D;color:#FCEBEB;border-color:#A32D2D}
+.btn-stop:hover{background:#791F1F}
+.btn-event{flex:1;font-size:11px;padding:8px 6px}
+.btn-fc{border-color:#D85A30;color:#993C1D}
+.btn-fc:hover{background:#FAECE7}
+.btn-sc{border-color:#BA7517;color:#854F0B}
+.btn-sc:hover{background:#FAEEDA}
+.btn-drop{border-color:#2C2C2A;color:var(--color-text-primary)}
+.btn-tp{border-color:#378ADD;color:#185FA5}
+.btn-tp:hover{background:#E6F1FB}
+.btn-mill{border-color:#1D9E75;color:#0F6E56}
+.btn-mill:hover{background:#E1F5EE}
+.input-row{display:grid;grid-template-columns:80px 1fr 1fr 80px;gap:8px;align-items:center;padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:8px}
+.input-row.active{background:#E6F1FB;border:1px solid #B5D4F4}
+.min-lbl{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.mini-input{font-size:14px;font-weight:500;text-align:center;width:100%}
+.ror-badge{font-size:11px;padding:3px 8px;border-radius:99px;text-align:center;white-space:nowrap}
+.event-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:5px;font-size:12px}
+.evt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.log-scroll{max-height:180px;overflow-y:auto}
+.chart-wrap{position:relative;width:100%;height:220px}
+.ror-wrap{position:relative;width:100%;height:80px;margin-top:8px}
+.legend{display:flex;gap:14px;margin-bottom:8px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)}
+.leg-dot{width:10px;height:3px;border-radius:2px}
+.phase-strip{height:6px;border-radius:3px;margin-bottom:10px;overflow:hidden;display:flex;gap:1px}
+.phase-seg{height:100%;flex:1;border-radius:2px}
+.section-divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:12px 0}
+.warn{background:#FAEEDA;color:#854F0B;border-radius:var(--border-radius-md);padding:8px 12px;font-size:12px;margin-bottom:10px;display:none}
+</style>
+
+<h2 class="sr-only" style="position:absolute;left:-9999px">실시간 로스팅 프로파일 기록기</h2>
+
+<div class="app">
+
+<div class="card" id="setupCard">
+  <div class="sec-title">원두 정보 입력</div>
+  <div class="grid2">
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">원산지</div>
+      <select id="origin">
+        <option>에티오피아</option><option>케냐</option><option>과테말라</option>
+        <option>브라질</option><option>코스타리카</option><option>콜롬비아</option><option>직접입력</option>
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">지역/농장</div>
+      <input type="text" id="region" placeholder="예: 예가체프 G1">
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">가공법</div>
+      <select id="process">
+        <option>워시드</option><option>내추럴</option><option>허니</option><option>혐기발효</option>
+      </select>
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">투입량 (g)</div>
+      <input type="number" id="chargeWeight" placeholder="예: 500" value="500">
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">투입 온도 (°C)</div>
+      <input type="number" id="chargeTemp" placeholder="예: 200" value="200">
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">목표 배출 온도 (°C)</div>
+      <input type="number" id="targetDrop" placeholder="예: 207" value="207">
+    </div>
+  </div>
+  <div style="margin-top:10px">
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:4px">메모</div>
+    <textarea id="memo" rows="2" placeholder="가스 압력, 에어플로우, 드럼 속도 등 초기 설정 메모" style="resize:vertical"></textarea>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button class="btn btn-start" id="startBtn" onclick="startRoast()" style="flex:1">로스팅 시작</button>
+  </div>
+</div>
+
+<div class="card" id="liveCard" style="display:none">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="sec-title" style="margin:0">실시간 기록</div>
+    <button class="btn btn-stop" onclick="stopRoast()">로스팅 종료</button>
+  </div>
+
+  <div class="grid3" style="margin-bottom:12px">
+    <div class="stat">
+      <div class="stat-lbl">경과 시간</div>
+      <div class="stat-val" id="timerDisplay">00:00</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">현재 BT</div>
+      <div class="stat-val" id="liveBT">—<span class="stat-unit">°C</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">RoR</div>
+      <div class="stat-val" id="liveRoR">—<span class="stat-unit">/min</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="btn btn-event btn-tp" onclick="logEvent('Turning Point','#378ADD')">TP</button>
+    <button class="btn btn-event btn-mill" onclick="logEvent('Maillard 시작','#1D9E75')">Maillard</button>
+    <button class="btn btn-event btn-fc" onclick="logEvent('1차 크랙 (FC)','#D85A30')">1차 크랙</button>
+    <button class="btn btn-event btn-sc" onclick="logEvent('2차 크랙 (SC)','#BA7517')">2차 크랙</button>
+    <button class="btn btn-event btn-drop" onclick="logEvent('Drop','#2C2C2A')">Drop</button>
+  </div>
+
+  <div class="warn" id="rorWarn">RoR 급락 주의 — 화력 또는 에어플로우를 확인하세요</div>
+
+  <div class="sec-title">분별 온도 입력</div>
+  <div id="inputRows"></div>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+  <div class="sec-title" style="margin-bottom:6px">프로파일 완성</div>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#D85A30;height:2px;width:14px"></div>BT (원두온도)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#378ADD;width:14px;height:0;border-top:2px dashed #378ADD"></div>ET (환경온도)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75;width:14px"></div>RoR</div>
+  </div>
+  <div class="chart-wrap"><canvas id="resultChart" role="img" aria-label="로스팅 완료 온도 프로파일 그래프"></canvas></div>
+  <div class="ror-wrap"><canvas id="rorResultChart" role="img" aria-label="RoR 변화 그래프"></canvas></div>
+  <hr class="section-divider">
+  <div class="sec-title">이벤트 로그</div>
+  <div id="finalEventLog"></div>
+  <hr class="section-divider">
+  <div class="grid2" style="margin-bottom:12px" id="summaryGrid"></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn" onclick="downloadCSV()" style="flex:1">CSV 다운로드</button>
+    <button class="btn" onclick="saveToHistory()" style="flex:1">기록 저장</button>
+    <button class="btn btn-start" onclick="sendPrompt('방금 기록한 로스팅 프로파일 데이터를 분석하고 개선 방향을 알려줘')" style="flex:1">AI 분석 ↗</button>
+  </div>
+</div>
+
+<div class="card" id="historyCard" style="display:none">
+  <div class="sec-title">저장된 프로파일</div>
+  <div id="historyList"></div>
+  <button class="btn" onclick="document.getElementById('historyCard').style.display='none'" style="margin-top:8px;width:100%">닫기</button>
+</div>
+
+<div style="text-align:right;margin-top:4px">
+  <button class="btn" onclick="showHistory()" style="font-size:11px">저장 기록 보기</button>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let timerInterval = null;
+let elapsedSec = 0;
+let btLog = [];
+let etLog = [];
+let eventLog = [];
+let currentMinute = 0;
+let roastInfo = {};
+let resultChart = null;
+let rorResultChart = null;
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function secToMs(s){ return pad(Math.floor(s/60))+':'+pad(s%60); }
+
+function startRoast(){
+  roastInfo = {
+    origin: document.getElementById('origin').value,
+    region: document.getElementById('region').value,
+    process: document.getElementById('process').value,
+    chargeWeight: document.getElementById('chargeWeight').value,
+    chargeTemp: document.getElementById('chargeTemp').value,
+    targetDrop: document.getElementById('targetDrop').value,
+    memo: document.getElementById('memo').value,
+    startAt: new Date().toLocaleString('ko-KR')
+  };
+  btLog = [];
+  etLog = [];
+  eventLog = [];
+  elapsedSec = 0;
+  currentMinute = 0;
+  document.getElementById('setupCard').style.display='none';
+  document.getElementById('liveCard').style.display='block';
+  document.getElementById('resultCard').style.display='none';
+  addInputRow(0);
+  timerInterval = setInterval(tickTimer, 1000);
+}
+
+function tickTimer(){
+  elapsedSec++;
+  document.getElementById('timerDisplay').textContent = secToMs(elapsedSec);
+  if(elapsedSec > 0 && elapsedSec % 60 === 0){
+    currentMinute++;
+    addInputRow(currentMinute);
+  }
+}
+
+function addInputRow(min){
+  const container = document.getElementById('inputRows');
+  const row = document.createElement('div');
+  row.className = 'input-row active';
+  row.id = 'row-'+min;
+  row.innerHTML = `
+    <div class="min-lbl">${min}분</div>
+    <div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:2px">BT (°C)</div>
+      <input type="number" class="mini-input" id="bt-${min}" placeholder="—" oninput="onTempInput(${min})">
+    </div>
+    <div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:2px">ET (°C)</div>
+      <input type="number" class="mini-input" id="et-${min}" placeholder="—">
+    </div>
+    <div id="ror-badge-${min}" class="ror-badge" style="background:var(--color-background-secondary);color:var(--color-text-secondary)">RoR —</div>
+  `;
+  container.appendChild(row);
+  row.scrollIntoView({behavior:'smooth', block:'nearest'});
+  setTimeout(()=>{ const el=document.getElementById('bt-'+min); if(el) el.focus(); }, 100);
+}
+
+function onTempInput(min){
+  const bt = parseFloat(document.getElementById('bt-'+min).value);
+  if(isNaN(bt)) return;
+  btLog[min] = bt;
+  document.getElementById('liveBT').textContent = Math.round(bt) + '°C';
+  if(min > 0 && btLog[min-1] !== undefined){
+    const ror = Math.round((bt - btLog[min-1]));
+    document.getElementById('liveRoR').textContent = ror + '/min';
+    const badge = document.getElementById('ror-badge-'+min);
+    if(ror >= 8 && ror <= 15){
+      badge.style.background='#EAF3DE'; badge.style.color='#3B6D11'; badge.textContent='RoR '+ror;
+    } else if(ror < 5){
+      badge.style.background='#FCEBEB'; badge.style.color='#A32D2D'; badge.textContent='RoR '+ror+' 낮음';
+      document.getElementById('rorWarn').style.display='block';
+    } else {
+      badge.style.background='#FAEEDA'; badge.style.color='#854F0B'; badge.textContent='RoR '+ror;
+      document.getElementById('rorWarn').style.display='none';
+    }
+  }
+  const row = document.getElementById('row-'+min);
+  if(row) { row.classList.remove('active'); }
+}
+
+function logEvent(name, color){
+  const timeStr = secToMs(elapsedSec);
+  const bt = btLog[currentMinute] || btLog[currentMinute-1] || '—';
+  eventLog.push({ time: timeStr, name, color, bt });
+  const el = document.createElement('div');
+  el.className = 'event-row';
+  el.innerHTML = `<div class="evt-dot" style="background:${color}"></div><span style="font-weight:500;min-width:36px">${timeStr}</span><span style="color:var(--color-text-secondary);min-width:52px">${isNaN(bt)?bt:Math.round(bt)+'°C'}</span><span>${name}</span>`;
+  document.getElementById('inputRows').appendChild(el);
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function stopRoast(){
+  clearInterval(timerInterval);
+  for(let i=0;i<=currentMinute;i++){
+    const btEl = document.getElementById('bt-'+i);
+    const etEl = document.getElementById('et-'+i);
+    if(btEl && btEl.value) btLog[i] = parseFloat(btEl.value);
+    if(etEl && etEl.value) etLog[i] = parseFloat(etEl.value);
+  }
+  roastInfo.totalTime = secToMs(elapsedSec);
+  roastInfo.endBT = btLog[btLog.length-1] || '—';
+  document.getElementById('liveCard').style.display='none';
+  buildResult();
+  document.getElementById('resultCard').style.display='block';
+}
+
+function buildResult(){
+  const labels = btLog.map((_,i)=>i+'분');
+  const rorData = btLog.map((v,i)=> i===0 ? null : (v && btLog[i-1] ? Math.round(v-btLog[i-1]) : null));
+
+  if(resultChart) resultChart.destroy();
+  if(rorResultChart) rorResultChart.destroy();
+
+  const filled = btLog.filter(v=>v!==undefined&&v!==null);
+  const minY = filled.length ? Math.max(80, Math.min(...filled)-20) : 80;
+  const maxY = filled.length ? Math.min(280, Math.max(...filled)+20) : 260;
+
+  resultChart = new Chart(document.getElementById('resultChart'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'BT',data:btLog,borderColor:'#D85A30',backgroundColor:'rgba(216,90,48,0.07)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#D85A30',tension:0.4,fill:true,spanGaps:true},
+        {label:'ET',data:etLog,borderColor:'#378ADD',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:0.4,spanGaps:true}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{grid:{color:'rgba(136,135,128,0.12)'},ticks:{font:{size:10},color:'#888780'}},
+        y:{min:minY,max:maxY,grid:{color:'rgba(136,135,128,0.12)'},ticks:{font:{size:10},color:'#888780',callback:v=>v+'°'}}
+      }
+    }
+  });
+
+  rorResultChart = new Chart(document.getElementById('rorResultChart'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[{label:'RoR',data:rorData,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.1)',borderWidth:2,pointRadius:0,tension:0.4,fill:true,spanGaps:true}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(136,135,128,0.12)'},ticks:{font:{size:9},color:'#888780'}},
+        y:{grid:{color:'rgba(136,135,128,0.12)'},ticks:{font:{size:9},color:'#888780',callback:v=>v+'/m'}}
+      }
+    }
+  });
+
+  const evLog = document.getElementById('finalEventLog');
+  evLog.innerHTML = '';
+  if(eventLog.length===0){
+    evLog.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">기록된 이벤트 없음</div>';
+  } else {
+    eventLog.forEach(e=>{
+      const d=document.createElement('div');
+      d.className='event-row';
+      d.innerHTML=`<div class="evt-dot" style="background:${e.color}"></div><span style="font-weight:500;min-width:38px">${e.time}</span><span style="color:var(--color-text-secondary);min-width:52px">${isNaN(e.bt)?e.bt:Math.round(e.bt)+'°C'}</span><span>${e.name}</span>`;
+      evLog.appendChild(d);
+    });
+  }
+
+  const sg = document.getElementById('summaryGrid');
+  const dropEvt = eventLog.find(e=>e.name==='Drop');
+  const fcEvt = eventLog.find(e=>e.name.includes('FC'));
+  const dropTemp = dropEvt ? (isNaN(dropEvt.bt)?'—':Math.round(dropEvt.bt)+'°C') : Math.round(roastInfo.endBT||0)+'°C';
+  const devTime = (dropEvt && fcEvt) ? calcDevTime(fcEvt.time, dropEvt.time) : '—';
+  sg.innerHTML = [
+    ['원산지', roastInfo.origin+' '+roastInfo.region],
+    ['가공법', roastInfo.process],
+    ['투입량', roastInfo.chargeWeight+'g'],
+    ['총 로스팅 시간', roastInfo.totalTime],
+    ['배출 온도', dropTemp],
+    ['Development 시간', devTime]
+  ].map(([l,v])=>`
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px">
+      <div style="font-size:10px;color:var(--color-text-secondary)">${l}</div>
+      <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-top:2px">${v}</div>
+    </div>`).join('');
+}
+
+function calcDevTime(t1, t2){
+  const toSec = t => { const p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]); };
+  const d = toSec(t2)-toSec(t1);
+  return d>0 ? secToMs(d) : '—';
+}
+
+function downloadCSV(){
+  let csv = '시간(분),BT(°C),ET(°C),RoR\n';
+  btLog.forEach((bt,i)=>{
+    const et = etLog[i] || '';
+    const ror = i>0&&btLog[i-1]!=null ? Math.round(bt-btLog[i-1]) : '';
+    csv += `${i},${bt||''},${et},${ror}\n`;
+  });
+  csv += '\n이벤트 로그\n시간,온도,이벤트\n';
+  eventLog.forEach(e=>{ csv+=`${e.time},${isNaN(e.bt)?e.bt:Math.round(e.bt)},${e.name}\n`; });
+  csv += '\n원두 정보\n';
+  Object.entries(roastInfo).forEach(([k,v])=>{ csv+=`${k},${v}\n`; });
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`roast_${roastInfo.origin}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function saveToHistory(){
+  const key = 'roastHistory';
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem(key)||'[]'); } catch(e){}
+  history.unshift({
+    id: Date.now(),
+    info: roastInfo,
+    btLog: [...btLog],
+    etLog: [...etLog],
+    events: [...eventLog]
+  });
+  if(history.length>20) history = history.slice(0,20);
+  localStorage.setItem(key, JSON.stringify(history));
+  const btn = event.target;
+  btn.textContent='저장 완료';
+  btn.disabled=true;
+  setTimeout(()=>{ btn.textContent='기록 저장'; btn.disabled=false; },2000);
+}
+
+function showHistory(){
+  const key='roastHistory';
+  let history=[];
+  try{ history=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){}
+  const card=document.getElementById('historyCard');
+  const list=document.getElementById('historyList');
+  if(history.length===0){
+    list.innerHTML='<div style="font-size:12px;color:var(--color-text-secondary)">저장된 기록이 없습니다.</div>';
+  } else {
+    list.innerHTML=history.map((h,i)=>`
+      <div style="padding:10px 12px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${h.info.origin} ${h.info.region}</div>
+          <div style="font-size:11px;color:var(--color-text-secondary)">${h.info.startAt||''}</div>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:3px">
+          ${h.info.process} · ${h.info.chargeWeight}g · ${h.info.totalTime}
+        </div>
+      </div>`).join('');
+  }
+  card.style.display='block';
+  card.scrollIntoView({behavior:'smooth'});
+}
+</script>
